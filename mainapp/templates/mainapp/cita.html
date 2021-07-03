@@ -1,0 +1,200 @@
+{% extends 'layouts/layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <br/><br/>
+        <h1 class="mt-4 mb-3">Carrito de compras</h1>
+
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'index' %}">Inicio</a>
+            </li>
+            <li class="breadcrumb-item active">Cesta</li>
+        </ol>      
+
+        <div class="row">
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Carrito</span>
+                    <span class="badge badge-secondary badge-pill">{{ servicios|length }}</span>
+                </h4>
+
+                <ul class="list-group mb-3">
+                    <!--for-->
+                    {% for servicio in servicios_distintos %}
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div class="my-3">
+                                {% load list_tag %}
+                                <span class="badge badge-secondary badge-pill">{{ servicios_contador|index:forloop.counter0 }}</span>
+                            </div>
+                            <div>
+                                <h6 class="my-0">{{ servicio.detalle }}</h6>
+                                <small class="text-muted">{{ servicio.duracion }} minutos</small>
+                            </div>
+                            <span class="text-muted">${{ servicio.precio }}</span>
+                            <form class="my-3" action="{% url 'deleteCart' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{ servicio.id}}" name="position">
+                                <button class="btn bg-transparent" type="submit"><span class="fa fa-ban"></span></button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                    <!--enfor-->
+                    {% if servicios_distintos|length == 0 %}
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <h6>Agrega productos a tu carrito primero</h6>
+                        </li>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total (MX)</span>
+                        <strong>${{ total }}</strong>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">Datos de la Cita</h4>
+            <!--form de sucursal-->
+                <form class="needs-validation" action="{% url 'cita' %}" id="formCita" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label for="cp_sucursal">Sucursal:</label>
+                            <select id="cp_sucursal" name="cp_sucursal" class="custom-select d-block w-100" required>
+                            <!--for de sucursales-->
+                            <option value="0">Escoje...</option>
+                            {% for sucursal in sucursales %}
+                                <option value="{{sucursal.id}}"> {{sucursal.name}} </option>
+                            {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Requerimos una sucursal.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cp_fecha">Fecha:</label>
+                            <input type="text" id="cp_fecha" name="cp_fecha" class="form-control" required readonly>
+                            <div class="invalid-feedback">
+                                Requerimos la fecha.
+                            </div>
+                        </div>
+                    </div>
+                <!--panel de drag and drop-->
+                     <div class="panel panel-info">
+                         <!--Lista de servicios-->
+                        <h5 class="mt-4 mb-3">Seleccione el orden de sus servicios</h5>
+                            <ul class="list-group" id="my-list">
+                                {% for servicio in servicios %}
+                                    <li class="list-group-item" data-id="{{ forloop.counter0 }}" style="cursor:grab">
+                                        <div class="row">
+                                            <div class="col-md-1 mb-3">
+                                                {{ forloop.counter }}
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                {{ servicio.detalle}}
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label for="cp_estilista">Estilista:</label>
+                                                <select id="cp_estilista" name="cp_estilista" class="custom-select d-block w-100" required>
+                                                    <option value="0">Escoge...</option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Requerimos un estilista.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            {% if servicios_distintos|length == 0 %}
+                                <div class="alert alert-danger">
+                                    <h6>Agrega productos a tu carrito primero!</h6>
+                                </div>
+                            {% endif %}
+                        </div>
+                    <hr class="mb-4">
+
+                    <div class="row">
+                        <h4 class="mb-3">Seleccione el Metódo de Pago</h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cp_anticipo">Anticipo:</label>
+                            <!--input del adelanto-->
+                            <input type="hidden" id="cp_total" name="cp_total" value="{{ total }}">
+                            <input type="text" id="cp_anticipo" name="cp_anticipo" class="form-control" style="font-weight: bold;" value="$ {% widthratio total 2 1 %}" readonly>
+                            <div class="invalid-feedback">
+                                Se requiere anticipo
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="credito" name="cp_metodpago" class="custom-control-input" checked required>
+                            <label class="custom-control-label" for="credito"><span class="fa fa-credit-card"></span> Tarjeta de Crédito</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="debito" name="cp_metodpago" class="custom-control-input" required>
+                            <label class="custom-control-label" for="debito"><span class="fa fa-credit-card-alt"></span> Tarjeta de Débito</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="paypal" name="cp_metodpago" class="custom-control-input" required>
+                            <label class="custom-control-label" for="paypal"><span class="fa fa-paypal"></span> Paypal</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cp_nombre">Nombre del propietario</label>
+                            <input type="text" id="cp_nombre" name="cp_nombre" class="form-control"  placeholder="" required>
+                            <div class="invalid-feedback">
+                                Se requiere Nombre del propietario
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="cp_numero">Número de tarjeta</label>
+                            <input type="text" id="cp_numero" name="cp_numero" class="form-control"  placeholder="" required>
+                            <div class="invalid-feedback">
+                                Se requiere número de tarjeta
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cp_expira">Expiración</label>
+                            <input type="text" id="cp_expira" name="cp_expira" class="form-control"  placeholder="" required>
+                            <div class="invalid-feedback">
+                                Se requiere la expiración tarjeta
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="cp_cvv">CVV</label>
+                            <input type="text" id="cp_cvv" name="cp_cvv" class="form-control" placeholder="" required>
+                            <div class="invalid-feedback">
+                                Se requiere el código de seguridad
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    {% if not user.email %}
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'login' %}">Iniciar Sesión</a>
+                    {% else %}
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Efectuar cita !!!</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <br><br>
+{% endblock content %}

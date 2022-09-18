@@ -1,20 +1,14 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.views import View
+
 from users.models import Estilista
 from sucursal.models import Sucursal
 from services.models import Servicio
-
+from django.shortcuts import redirect
 
 # Create your views here.
 def index(request):
     return render(request, "mainapp/index.html")
-
-
-def servicios(request):
-    servicio = Servicio.objects.filter(status=True)
-    return render(request, "mainapp/servicios.html", {
-        'servicios': servicio
-    })
-
 
 def contacto(request):
     if request.method == 'POST':
@@ -29,6 +23,7 @@ def contacto(request):
     return render(request, "mainapp/contacto.html", {
         'sucursales': sucursales
     })
+
 
 
 def cita(request):

@@ -1,9 +1,10 @@
 from django.urls import path
 from . import views
+from services.views import Servicios
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('servicios/', views.servicios, name="servicios"),
+    path('servicios/', Servicios.as_view(), name="servicios"),
     path('contacto/', views.contacto, name="contacto"),
     path('cita/', views.cita, name="cita"),
     path('cita/<int:sucursal>/', views.estilistas),

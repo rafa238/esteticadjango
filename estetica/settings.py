@@ -78,26 +78,23 @@ WSGI_APPLICATION = 'estetica.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 """
+'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'estetica',
+    'USER': 'root',
+    'PASSWORD': 'burr0510',
+    'HOST': 'localhost',
+    'PORT': 3306
+}
+"""
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'estetica',
-        'USER': 'root',
-        'PASSWORD': 'burr0510',
-        'HOST': 'localhost',
-        'PORT': 3306
-    }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -112,8 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
